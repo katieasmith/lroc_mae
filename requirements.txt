@@ -1,0 +1,11 @@
+torch
+torchvision
+timm
+rasterio
+pyproj
+pandas
+pyyaml
+matplotlib
+tensorboard
+einops
+terratorch   # optional: only for fine-tuning through TerraTorch
