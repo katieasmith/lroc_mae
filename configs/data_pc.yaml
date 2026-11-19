@@ -1,0 +1,37 @@
+# Data and metadata for LROC FM pretraining. Training hyperparameters are command-line arguments
+# of main_pretrain.py (MAE style); crop size and patch size come from --input_size and --model.
+
+data:
+  # for if running make_manifest.py, build_index.py, and extract_tiles.py on PC
+  manifest: D:/lroc_data/manifest.csv   # written by tools/make_manifest.py
+  out_dir: D:/lroc_data/index           # images.csv, tiles.csv, stats.json (tools/build_index.py)
+  bands: [1]                      # NAC: single band
+  tile_size: 256                  # tiles cut from each image (Prithvi: 256); changing it needs re-indexing
+  max_nodata_frac: 0.01           # drop tiles with >1% invalid pixels (Prithvi: 1%)
+  valid_range: [-1.0, 10.0]       # lronaccal I/F; ISIS NULL/special pixels fall outside
+  min_tile_std: 0.0               # >0 drops featureless (e.g. fully shadowed) tiles
+  max_tiles_per_image: 1500       # cap per image (Prithvi: 1,500 per tile)
+  val_frac: 0.05                  # 95/5 train/validation split by spatial cell
+  split_cell_deg: 2.0
+  seed: 0
+  hflip: true                     # azimuth variables are reflected with the image
+  vflip: false
+
+geo:
+  date_tags: [START_TIME]         # only used if the manifest has no date column
+
+metadata:
+  groups:
+    location:
+      - {name: lat, source: geo}
+      - {name: lon, source: geo, periodic: true}
+    time:
+      - {name: year, source: date}
+      - {name: doy, source: date}
+    illumination:
+      - {name: incidence, source: raster}                                    # <name>_in.tif
+      - {name: sun_azimuth, source: raster, periodic: true, direction: true} # <name>_sga.tif
+    viewing:
+      - {name: emission, source: raster}                                     # <name>_em.tif
+      - {name: phase, source: raster}                                        # <name>_ph.tif
+      - {name: sc_azimuth, source: raster, periodic: true, direction: true}  # <name>_scga.tif

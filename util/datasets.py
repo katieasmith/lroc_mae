@@ -62,7 +62,8 @@ def _fill_nan(g: np.ndarray, periodic: bool) -> bool:
 # Dataset
 # ----------------------------------------------------------------------------------------
 class LROCTiles(Dataset):
-    def __init__(self, cfg: dict, split: str = "train", train: bool = True, max_open_files: int = 64):
+    def __init__(self, cfg: dict, split: str = "train", train: bool = True, max_open_files: int = 1024):
+    #def __init__(self, cfg: dict, split: str = "train", train: bool = True, max_open_files: int = 64):
         d = cfg["data"]
         self.cfg = copy.deepcopy(cfg)
         self.train = train

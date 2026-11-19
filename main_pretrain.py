@@ -86,7 +86,8 @@ def main(args):
     misc.init_distributed_mode(args)
     print('{}'.format(args).replace(', ', ',\n'))
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
-    args.amp_dtype = torch.bfloat16 if device.type == 'cuda' and torch.cuda.is_bf16_supported() else torch.float16
+    args.amp_dtype = torch.bfloat16 if device.type == 'cuda' and torch.cuda.is_bf16_supported(including_emulation=False) else torch.float16
+    #args.amp_dtype = torch.bfloat16 if device.type == 'cuda' and torch.cuda.is_bf16_supported() else torch.float16
 
     seed = args.seed + misc.get_rank()
     torch.manual_seed(seed)
