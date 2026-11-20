@@ -128,6 +128,8 @@ def main(args):
                                             norm_pix_loss=args.norm_pix_loss, variables=variables,
                                             meta_mode=args.meta_mode)
     model.to(device)
+    print(f"parameters: encoder {sum(p.numel() for p in model.encoder.parameters())/1e6:.2f}M, "
+          f"total {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
     model_without_ddp = model
 
     eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
