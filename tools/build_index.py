@@ -88,6 +88,13 @@ def _scan_image(task):
     except Exception as e:  # keep going; report at the end
         return None, f"{row['image_id']}: {e}"
 
+def coarse_frac(band, bad, k=8):
+    """std of the k x k block-mean image / std of the tile. Terrain ~0.5-0.8, pure noise ~0.1."""
+    t = np.where(bad, band[~bad].mean(), band).astype(np.float64)
+    h, w = (t.shape[0] // k) * k, (t.shape[1] // k) * k
+    t = t[:h, :w]
+    sd = t.std()
+    return 0.0 if sd == 0 else float(t.reshape(h // k, k, w // k, k).mean(axis=(1, 3)).std() / sd)
 
 # ----------------------------------------------------------------------------------------
 # Pass 2: tiling, filtering and statistics
@@ -97,6 +104,7 @@ def _tile_image(task):
     d = cfg["data"]
     S, bands = int(d["tile_size"]), list(d.get("bands", [1]))
     max_nodata, min_std = float(d.get("max_nodata_frac", 0.01)), float(d.get("min_tile_std", 0.0))
+    min_coarse = float(d.get("min_tile_coarse", 0.0))
     deg = float(d.get("split_cell_deg", 2.0))
     s1 = np.zeros(len(bands)); s2 = np.zeros(len(bands)); n = 0
     tiles, n_blocked = [], 0
@@ -113,6 +121,8 @@ def _tile_image(task):
                     continue
                 good = sub[:, ~bad]
                 if min_std > 0 and good.std(axis=1).max() < min_std:
+                    continue
+                if min_coarse > 0 and max(coarse_frac(b, bad) for b in sub) < min_coarse:
                     continue
                 rr = np.array([r, r, r + S - 1, r + S - 1, r + (S - 1) / 2])
                 cc = np.array([c, c + S - 1, c, c + S - 1, c + (S - 1) / 2])

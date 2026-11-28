@@ -15,6 +15,7 @@ data:
   seed: 0
   hflip: true                     # azimuth variables are reflected with the image
   vflip: false
+  min_tile_coarse: 0.65           # minimum tile coarseness
 
 geo:
   date_tags: [START_TIME]         # only used if the manifest has no date column
